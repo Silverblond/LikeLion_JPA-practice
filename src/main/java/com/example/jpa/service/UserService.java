@@ -62,7 +62,6 @@ public class UserService {
         if(userDto.getPassword() != null){
             user.setPassword(userDto.getPassword());
         }
-
         return user;
     }
 
