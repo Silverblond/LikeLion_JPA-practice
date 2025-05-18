@@ -7,6 +7,7 @@ import com.example.jpa.repository.PostRepository;
 import com.example.jpa.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -41,6 +42,7 @@ public class PostService {
     }
 
     //Post 생성(POST)
+    @Transactional
     public Long creatPost(PostCreateRequestDto dto){
         return userRepository.findById(dto.getUserId())
                 .map(user -> {
@@ -54,7 +56,51 @@ public class PostService {
 
     }
 
+    //Post 수정(PUT)
+    @Transactional
+    public PostResponseDto updatePost(Long id, PostCreateRequestDto dto){
+        return postRepository.findById(id)
+                .map(post -> {
+                    post.setTitle(dto.getTitle());
+                    post.setContent(dto.getContent());
+                    post.setUser(userRepository.findById(dto.getUserId())
+                            .orElseThrow(() -> new IllegalArgumentException("해당 id의 유저를 찾을 수 없습니다.")));
+
+                    return new PostResponseDto(
+                            post.getId(),
+                            post.getTitle(),
+                            post.getContent(),
+                            post.getUser().getUsername()
+                    );
+                })
+        .orElseThrow(() -> new IllegalArgumentException("해당" + id + "의 글을 찾을 수 없습니다."));
+    }
+
+    //Post 일부 수정(PATCH)
+    @Transactional
+    public PostResponseDto patchPost(Long id, PostCreateRequestDto dto){
+        return postRepository.findById(id)
+                .map(post -> {
+                    if(dto.getTitle() != null)
+                        post.setTitle(dto.getTitle());
+                    if(dto.getContent() != null)
+                        post.setContent(dto.getContent());
+                    if(dto.getUserId() != null){
+                        post.setUser(userRepository.findById(dto.getUserId())
+                                .orElseThrow(() -> new IllegalArgumentException("해당 id의 유저를 찾을 수 없습니다.")));
+                    }
+                    return new PostResponseDto(
+                            post.getId(),
+                            post.getTitle(),
+                            post.getContent(),
+                            post.getUser().getUsername()
+                    );
+                })
+                .orElseThrow(() -> new IllegalArgumentException("해당" + id + "의 글을 찾을 수 없습니다."));
+    }
+
     //Post 삭제(DELETE)
+    @Transactional
     public void deletePost(Long id){
         postRepository.delete(postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당" + id + "의 글을 찾을 수 없습니다.")));
