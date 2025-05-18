@@ -49,8 +49,8 @@ public class PostService {
                     Post post = new Post();
                     post.setTitle(dto.getTitle());
                     post.setContent(dto.getContent());
-                    post.setUser(user);
-                    return postRepository.save(post).getId();
+                    post.setUser(user); //작성자
+                    return postRepository.save(post).getId(); //DB에 저장 후 ID 반환
                 })
                 .orElseThrow(() -> new IllegalArgumentException("해당" + dto.getUserId() + "의 글을 찾을 수 없습니다."));
 
@@ -61,12 +61,12 @@ public class PostService {
     public PostResponseDto updatePost(Long id, PostCreateRequestDto dto){
         return postRepository.findById(id)
                 .map(post -> {
-                    post.setTitle(dto.getTitle());
-                    post.setContent(dto.getContent());
+                    post.setTitle(dto.getTitle()); //제목 덮어쓰기
+                    post.setContent(dto.getContent()); //내용 덮어 쓰기
                     post.setUser(userRepository.findById(dto.getUserId())
                             .orElseThrow(() -> new IllegalArgumentException("해당 id의 유저를 찾을 수 없습니다.")));
 
-                    return new PostResponseDto(
+                    return new PostResponseDto( //DTO로 반환
                             post.getId(),
                             post.getTitle(),
                             post.getContent(),
@@ -82,9 +82,9 @@ public class PostService {
         return postRepository.findById(id)
                 .map(post -> {
                     if(dto.getTitle() != null)
-                        post.setTitle(dto.getTitle());
+                        post.setTitle(dto.getTitle()); //제목만 수정 가능
                     if(dto.getContent() != null)
-                        post.setContent(dto.getContent());
+                        post.setContent(dto.getContent()); //내용만 수정 가능
                     if(dto.getUserId() != null){
                         post.setUser(userRepository.findById(dto.getUserId())
                                 .orElseThrow(() -> new IllegalArgumentException("해당 id의 유저를 찾을 수 없습니다.")));
