@@ -54,4 +54,10 @@ public class PostService {
 
     }
 
+    //Post 삭제(DELETE)
+    public void deletePost(Long id){
+        postRepository.delete(postRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당" + id + "의 글을 찾을 수 없습니다.")));
+    }
+
 }
